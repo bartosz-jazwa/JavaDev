@@ -1,5 +1,7 @@
 package com.jazwa.javadev.model;
 
+import org.springframework.security.core.GrantedAuthority;
+
 import javax.persistence.*;
 import java.util.List;
 import java.util.Set;
@@ -8,23 +10,21 @@ import java.util.Set;
 public class Participant {
     @Id
     private Integer index;
-    @Column(unique = true)
+    @Column(unique = true,nullable = false)
     private String email;
     private String password;
     private String name;
     private String surname;
     private Integer yearOfStudy;
     private String fieldOfStudy;
-    private Role role;
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(joinColumns = {@JoinColumn(name = "participant_index")},
-    inverseJoinColumns = {@JoinColumn(name = "courseclass_starttime")})
+    private GrantedAuthority role;
+    @ManyToMany(mappedBy = "participants")
     private Set<CourseClass> classes;
 
     public Participant() {
     }
 
-    public Participant(Integer index, String email, String password, String name, String surname, Integer yearOfStudy, String fieldOfStudy, Role role) {
+    public Participant(Integer index, String email, String password, String name, String surname, Integer yearOfStudy, String fieldOfStudy) {
         this.index = index;
         this.email = email;
         this.password = password;
@@ -32,7 +32,6 @@ public class Participant {
         this.surname = surname;
         this.yearOfStudy = yearOfStudy;
         this.fieldOfStudy = fieldOfStudy;
-        this.role = role;
     }
 
     public void changePassword(String oldPassword, String newPassword, String repeatNewPassword){
@@ -99,11 +98,11 @@ public class Participant {
         this.fieldOfStudy = fieldOfStudy;
     }
 
-    public Role getRole() {
+    public GrantedAuthority getRole() {
         return role;
     }
 
-    public void setRole(Role role) {
+    public void setRole(GrantedAuthority role) {
         this.role = role;
     }
 }

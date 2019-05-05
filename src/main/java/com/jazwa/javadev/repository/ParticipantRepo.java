@@ -6,4 +6,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ParticipantRepo extends JpaRepository<Participant,Integer> {
+
+    Participant getParticipantByEmail(String email);
+
+    Participant getParticipantByIndex(Integer index);
 }

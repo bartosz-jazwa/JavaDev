@@ -1,6 +1,7 @@
 package com.jazwa.javadev.model;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import java.time.LocalDateTime;
@@ -14,7 +15,7 @@ public class CourseClass {
     private String title;
     private String description;
     private String tutor;
-    @ManyToMany(mappedBy = "classes")
+    @ManyToMany(fetch = FetchType.EAGER)
     private Set<Participant> participants;
 
     public void addParticipant(Participant participant){
