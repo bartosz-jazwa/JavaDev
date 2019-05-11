@@ -1,6 +1,7 @@
 package com.jazwa.javadev.model;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import javax.persistence.*;
 import java.util.List;
@@ -17,7 +18,7 @@ public class Participant {
     private String surname;
     private Integer yearOfStudy;
     private String fieldOfStudy;
-    private GrantedAuthority role;
+    private SimpleGrantedAuthority role;
     @ManyToMany(mappedBy = "participants")
     private Set<CourseClass> classes;
 
@@ -98,11 +99,11 @@ public class Participant {
         this.fieldOfStudy = fieldOfStudy;
     }
 
-    public GrantedAuthority getRole() {
+    public SimpleGrantedAuthority getRole() {
         return role;
     }
 
-    public void setRole(GrantedAuthority role) {
+    public void setRole(SimpleGrantedAuthority role) {
         this.role = role;
     }
 }
