@@ -1,6 +1,7 @@
 package com.jazwa.javadev.config;
 
 import com.jazwa.javadev.service.ParticipantDetailsService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -8,6 +9,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsPasswordService;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -32,6 +34,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
+
     @Override
     protected void configure(AuthenticationManagerBuilder auth) {
         auth.authenticationProvider(authenticationProvider());
@@ -39,17 +42,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .authorizeRequests().antMatchers("/wallPage").hasAnyRole("ADMIN", "USER")
+                .csrf().disable()
+                .headers().frameOptions().disable() //odblokowuje baze H2
                 .and()
-                .authorizeRequests().antMatchers("/login", "/resource/**").permitAll()
+                .authorizeRequests().antMatchers("/login").permitAll()
+
                 .and()
-                .formLogin().loginPage("/login").usernameParameter("username").passwordParameter("password").permitAll()
-                .loginProcessingUrl("/doLogin")
-                .successForwardUrl("/postLogin")
-                .failureUrl("/loginFailed")
-                .and()
-                .logout().logoutUrl("/doLogout").logoutSuccessUrl("/logout").permitAll()
-                .and()
-                .csrf().disable();
+                .csrf().disable()
+
+                .formLogin().disable();
     }
 }
