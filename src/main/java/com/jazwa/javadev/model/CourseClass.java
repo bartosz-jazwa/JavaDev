@@ -1,9 +1,8 @@
 package com.jazwa.javadev.model;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
+import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
@@ -12,6 +11,9 @@ import java.util.Set;
 @Entity
 public class CourseClass {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @NotNull
     private LocalDateTime startTime;
     private String title;
     private String description;
@@ -35,6 +37,10 @@ public class CourseClass {
         this.title = title;
         this.description = description;
         this.tutor = tutor;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public LocalDateTime getStartTime() {

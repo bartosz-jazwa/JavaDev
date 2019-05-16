@@ -22,25 +22,36 @@ public class ClassServiceImpl implements ClassService {
         LocalDateTime stop = LocalDateTime.of(date,LocalTime.MAX);
 
         return classRepo.findCourseClassesByStartTimeIsAfterAndStartTimeIsBefore(start,stop);
-
     }
 
     @Override
-    public boolean addNewClass(CourseClass courseClass) {
+    public Optional<CourseClass> addNewClass(CourseClass courseClass) {
 
-        if(courseClass.getStartTime().isAfter(LocalDateTime.now())
-        && !classRepo.existsById(courseClass.getStartTime())){
-            classRepo.save(courseClass);
-            return true;
+        if(courseClass.getStartTime().isAfter(LocalDateTime.now()))
+        //&& !classRepo.existsById(courseClass.getId()))
+        {
+            return Optional.ofNullable(classRepo.save(courseClass));
+        }else {
+            return Optional.empty();
         }
+    }
 
-        return false;
+    @Override
+    public Optional<CourseClass> cancelClass(Long id) {
+        CourseClass foundCourseClass;
+        Optional<CourseClass> result = classRepo.findById(id);
+        if(result.isPresent()){
+            foundCourseClass = result.get();
+        }else {
+            return result;
+        }
+        return classRepo.deleteCourseClassById(foundCourseClass.getId());
     }
 
     @Override
     public Optional<CourseClass> cancelClass(CourseClass courseClass) {
         if(courseClass.getStartTime().isAfter(LocalDateTime.now())){
-            return Optional.ofNullable(classRepo.deleteByStartTime(courseClass.getStartTime()));
+            return classRepo.deleteCourseClassById(courseClass.getId());
         }
         return Optional.empty();
     }
@@ -49,9 +60,8 @@ public class ClassServiceImpl implements ClassService {
     public Optional<CourseClass> cancelClass(LocalDateTime classDate) {
 
         if(classDate.isAfter(LocalDateTime.now())){
-            return Optional.ofNullable(classRepo.deleteByStartTime(classDate));
+            return classRepo.deleteCourseClassByStartTime(classDate);
         }
-
         return Optional.empty();
     }
 

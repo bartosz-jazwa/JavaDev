@@ -6,12 +6,12 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.Set;
 
 @Repository
-public interface ClassRepo extends JpaRepository<CourseClass, LocalDateTime> {
-    //Set<CourseClass> findCourseClassesByStartTimeIsIn(LocalDateTime startDate,LocalDateTime finishDate);
+public interface ClassRepo extends JpaRepository<CourseClass, Long> {
     Set<CourseClass> findCourseClassesByStartTimeIsAfterAndStartTimeIsBefore(LocalDateTime startDate,LocalDateTime finishDate);
-    //Set<CourseClass> findCourseClassesByStartTimeWithin(LocalDateTime startDate,LocalDateTime finishDate);
-    CourseClass deleteByStartTime(LocalDateTime startTime);
+    Optional<CourseClass> deleteCourseClassById(Long id);
+    Optional<CourseClass> deleteCourseClassByStartTime(LocalDateTime startTime);
 }

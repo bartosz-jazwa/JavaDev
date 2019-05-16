@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityNotFoundException;
 import javax.swing.text.html.Option;
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -19,14 +20,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-@RestController("/classes")
+@RestController
+@RequestMapping("/classes")
 public class CourseController {
     @Autowired
     ClassRepo classRepository;
     @Autowired
     ClassService classService;
 
-    @GetMapping()
+    @GetMapping
     ResponseEntity<List<CourseClass>> getAllClasses(){
         List<CourseClass> classList = classRepository.findAll();
         if (classList.isEmpty()){
@@ -35,8 +37,8 @@ public class CourseController {
         return ResponseEntity.ok(classList);
     }
 
-    @GetMapping("/{date}")
-    ResponseEntity<Set<CourseClass>> getClassesByDate(@PathVariable String date){
+    @GetMapping(params = "date")
+    ResponseEntity<Set<CourseClass>> getClassesByDate(@RequestParam String date){
 
         LocalDate courseDate = LocalDate.parse(date);
         Set<CourseClass> courseClasses = classService.findByDate(courseDate);
@@ -46,24 +48,30 @@ public class CourseController {
         return ResponseEntity.ok(courseClasses);
     }
 
-    @PostMapping("/classes")
+    @GetMapping("/{id}")
+    ResponseEntity<CourseClass> getOneCourseClass(@PathVariable String id){
+        Long classId = Long.parseLong(id);
+        return ResponseEntity.of(classRepository.findById(classId));
+    }
+
+    @PostMapping
     ResponseEntity<CourseClass> addNewClass(@RequestBody CourseClass courseClass){
 
-        if (classService.addNewClass(courseClass)){
-            return ResponseEntity.ok(courseClass);
+        Optional<CourseClass> result = classService.addNewClass(courseClass);
+
+        if (result.isPresent()){
+            return ResponseEntity.ok(result.get());
         }else {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
-
     }
-    @DeleteMapping("/classes/{date}/{time}")
-    ResponseEntity<CourseClass> deleteClass(@PathVariable String date,
-                                            @PathVariable String time){
-        LocalDate localDate = LocalDate.parse(date);
-        LocalTime localTime = LocalTime.parse(time);
-        LocalDateTime dateTime = LocalDateTime.of(localDate,localTime);
 
-        Optional<CourseClass> deleteResult = classService.cancelClass(dateTime);
+    @DeleteMapping("/{id}")
+    ResponseEntity<CourseClass> deleteClass(@PathVariable String id){
+
+        Long classId = Long.parseLong(id);
+
+        Optional<CourseClass> deleteResult = classService.cancelClass(classId);
         if (!deleteResult.isPresent()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
@@ -71,8 +79,8 @@ public class CourseController {
 
     }
 
-    @DeleteMapping("/classes/{date}")
-    ResponseEntity<Set<CourseClass>> deleteClass(@PathVariable String date){
+    @DeleteMapping("/{date}")
+    ResponseEntity<Set<CourseClass>> deleteClasses(@PathVariable String date){
         LocalDate localDate = LocalDate.parse(date);
 
         Set<CourseClass> classSet = classService.cancelClasses(localDate);
@@ -82,25 +90,32 @@ public class CourseController {
         return ResponseEntity.ok(classSet);
     }
 
-    @PutMapping("/classes/{date}/{time}")
-    ResponseEntity<CourseClass> updateClass(@PathVariable String date,
-                                            @PathVariable String time,
+    @PutMapping("/{id}")
+    ResponseEntity<CourseClass> updateClass(@PathVariable String id,
+                                            @RequestParam String date,
+                                            @RequestParam String time,
                                             @RequestParam String title,
-                                            @RequestParam String description,
-                                            @RequestParam String tutor){
+                                            @RequestParam(required = false) String description,
+                                            @RequestParam(required = false) String tutor){
 
-        LocalDate localDate = LocalDate.parse(date);
-        LocalTime localTime = LocalTime.parse(time);
-        LocalDateTime classId = LocalDateTime.of(localDate,localTime);
+        LocalDateTime localDateTime;
+        Long classId;
+        try{
+            localDateTime = LocalDateTime.of(LocalDate.parse(date),LocalTime.parse(time));
+            classId = Long.parseLong(id);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
+
         Optional<CourseClass> courseClass = classRepository.findById(classId);
         courseClass.ifPresent(course -> {
+            course.setStartTime(localDateTime);
             course.setTitle(title);
             course.setDescription(description);
             course.setTutor(tutor);
-
+            classRepository.save(course);
         });
 
         return ResponseEntity.of(courseClass);
     }
-
 }
