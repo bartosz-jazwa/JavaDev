@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -15,23 +16,24 @@ import java.util.Set;
 public class ClassServiceImpl implements ClassService {
     @Autowired
     ClassRepo classRepo;
+
     @Override
-    public Set<CourseClass> findByDate(LocalDate date) {
+    public Set<CourseClass> getByDate(LocalDate date) {
 
-        LocalDateTime start = LocalDateTime.of(date,LocalTime.MIN);
-        LocalDateTime stop = LocalDateTime.of(date,LocalTime.MAX);
+        LocalDateTime start = LocalDateTime.of(date, LocalTime.MIN);
+        LocalDateTime stop = LocalDateTime.of(date, LocalTime.MAX);
 
-        return classRepo.findCourseClassesByStartTimeIsAfterAndStartTimeIsBefore(start,stop);
+        return classRepo.findCourseClassesByStartTimeIsAfterAndStartTimeIsBefore(start, stop);
     }
 
     @Override
     public Optional<CourseClass> addNewClass(CourseClass courseClass) {
 
-        if(courseClass.getStartTime().isAfter(LocalDateTime.now()))
+        if (courseClass.getStartTime().isAfter(LocalDateTime.now()))
         //&& !classRepo.existsById(courseClass.getId()))
         {
             return Optional.ofNullable(classRepo.save(courseClass));
-        }else {
+        } else {
             return Optional.empty();
         }
     }
@@ -40,9 +42,9 @@ public class ClassServiceImpl implements ClassService {
     public Optional<CourseClass> cancelClass(Long id) {
         CourseClass foundCourseClass;
         Optional<CourseClass> result = classRepo.findById(id);
-        if(result.isPresent()){
+        if (result.isPresent()) {
             foundCourseClass = result.get();
-        }else {
+        } else {
             return result;
         }
         return classRepo.deleteCourseClassById(foundCourseClass.getId());
@@ -50,7 +52,7 @@ public class ClassServiceImpl implements ClassService {
 
     @Override
     public Optional<CourseClass> cancelClass(CourseClass courseClass) {
-        if(courseClass.getStartTime().isAfter(LocalDateTime.now())){
+        if (courseClass.getStartTime().isAfter(LocalDateTime.now())) {
             return classRepo.deleteCourseClassById(courseClass.getId());
         }
         return Optional.empty();
@@ -59,7 +61,7 @@ public class ClassServiceImpl implements ClassService {
     @Override
     public Optional<CourseClass> cancelClass(LocalDateTime classDate) {
 
-        if(classDate.isAfter(LocalDateTime.now())){
+        if (classDate.isAfter(LocalDateTime.now())) {
             return classRepo.deleteCourseClassByStartTime(classDate);
         }
         return Optional.empty();
@@ -67,13 +69,30 @@ public class ClassServiceImpl implements ClassService {
 
     @Override
     public Set<CourseClass> cancelClasses(LocalDate classesDate) {
-        LocalDateTime startTime = LocalDateTime.of(classesDate,LocalTime.MIN);
-        LocalDateTime finishTime = LocalDateTime.of(classesDate,LocalTime.MAX);
+        LocalDateTime startTime = LocalDateTime.of(classesDate, LocalTime.MIN);
+        LocalDateTime finishTime = LocalDateTime.of(classesDate, LocalTime.MAX);
         Set<CourseClass> foundClasses = classRepo
-                .findCourseClassesByStartTimeIsAfterAndStartTimeIsBefore(startTime,finishTime);
+                .findCourseClassesByStartTimeIsAfterAndStartTimeIsBefore(startTime, finishTime);
 
         classRepo.deleteAll(foundClasses);
 
         return foundClasses;
+    }
+
+    @Override
+    public CourseClass save(CourseClass courseClass) {
+        return classRepo.save(courseClass);
+    }
+
+    @Override
+    public Set<CourseClass> getAll() {
+        Set<CourseClass> returnResult = new HashSet<>();
+        returnResult.addAll(classRepo.findAll());
+        return returnResult;
+    }
+
+    @Override
+    public Optional<CourseClass> getById(Long id) {
+        return classRepo.findById(id);
     }
 }

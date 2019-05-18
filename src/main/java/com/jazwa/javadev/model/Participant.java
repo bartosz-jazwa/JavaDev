@@ -10,15 +10,19 @@ import java.util.Set;
 @Entity
 public class Participant {
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private Long id;
+    @Column(unique = true)
     private Integer index;
     @Column(unique = true,nullable = false)
     private String email;
+    @Column(nullable = false)
     private String password;
     private String name;
     private String surname;
     private Integer yearOfStudy;
     private String fieldOfStudy;
-    private SimpleGrantedAuthority role;
+    private Role role;
     @ManyToMany(mappedBy = "participants")
     private Set<CourseClass> classes;
 
@@ -33,14 +37,6 @@ public class Participant {
         this.surname = surname;
         this.yearOfStudy = yearOfStudy;
         this.fieldOfStudy = fieldOfStudy;
-    }
-
-    public void changePassword(String oldPassword, String newPassword, String repeatNewPassword){
-
-    }
-
-    public void addClass(CourseClass courseClass){
-
     }
 
     public Integer getIndex() {
@@ -99,11 +95,15 @@ public class Participant {
         this.fieldOfStudy = fieldOfStudy;
     }
 
-    public SimpleGrantedAuthority getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(SimpleGrantedAuthority role) {
+    public void setRole(Role role) {
         this.role = role;
+    }
+
+    public Long getId() {
+        return id;
     }
 }

@@ -1,6 +1,7 @@
 package com.jazwa.javadev.service;
 
 import com.jazwa.javadev.model.Participant;
+import com.jazwa.javadev.model.Role;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -9,17 +10,23 @@ import java.util.Set;
 
 public interface ParticipantService {
 
-    Set<Participant> findAll();
+    Set<Participant> getAll();
 
-    Optional<Participant> findByIndex(Integer index);
+    Optional<Participant> getByIndex(Integer index);
 
-    Optional<Participant> findByEmail(String email);
+    Optional<Participant> getByEmail(String email);
 
-    boolean deleteByIndex(Integer index);
+    Optional<Participant> getById(Long id);
 
-    boolean deleteByEmail(String email);
+    Set<Participant> getByRole(Role role);
 
-    boolean addWithIndex(Integer index,String password);
+    Optional<Participant> deleteByIndex(Integer index);
 
-    boolean addWithEmail(String email, String password);
+    Optional<Participant> deleteByEmail(String email);
+
+    Optional<Participant> deleteById(Long id);
+
+    Optional<Participant> addWithIndex(Integer index,String password);
+
+    Optional<Participant> addWithEmail(String email, String password);
 }

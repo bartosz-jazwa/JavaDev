@@ -1,5 +1,8 @@
 package com.jazwa.javadev.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -38,11 +41,10 @@ public class CourseClass {
         this.description = description;
         this.tutor = tutor;
     }
-
     public Long getId() {
         return id;
     }
-
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSS")
     public LocalDateTime getStartTime() {
         return startTime;
     }
@@ -81,5 +83,9 @@ public class CourseClass {
 
     public void setParticipants(Set<Participant> participants) {
         this.participants = participants;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

@@ -1,40 +1,41 @@
 package com.jazwa.javadev.controller;
 
 import com.jazwa.javadev.model.Participant;
-import com.jazwa.javadev.repository.ParticipantRepo;
+import com.jazwa.javadev.model.Role;
 import com.jazwa.javadev.service.ParticipantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.EntityNotFoundException;
-import java.util.List;
 import java.util.Set;
 
 @RestController
+@RequestMapping("/participants")
 public class ParticipantController {
     @Autowired
     ParticipantService participantService;
 
-    @GetMapping("/participants")
+    @GetMapping
     ResponseEntity<Set<Participant>> getAllParticipants(){
-        Set<Participant> participants = participantService.findAll();
+        Set<Participant> participants = participantService.getAll();
         return ResponseEntity.ok(participants);
     }
 
-    @GetMapping("/participants/{email}")
-    ResponseEntity<Participant> getParticipantByEmail(@PathVariable String email){
-
-        //Participant participant = participantService.findByEmail(email).orElseThrow(EntityNotFoundException::new);
-        return ResponseEntity.of(participantService.findByEmail(email));
+    @GetMapping("/{id}")
+    ResponseEntity<Participant> getParticipant(@PathVariable String id){
+        Long partId = Long.parseLong(id);
+        return ResponseEntity.of(participantService.getById(partId));
     }
 
-    @GetMapping("/participants/{index}")
-    ResponseEntity<Participant> getParticipantByIndex(@PathVariable String index){
-        Integer indexParam = Integer.parseInt(index);
-        //Participant participant = participantService.findByEmail(email).orElseThrow(EntityNotFoundException::new);
-        return ResponseEntity.of(participantService.findByIndex(indexParam));
+    @GetMapping(params = "role")
+    ResponseEntity<Set<Participant>> getParticipantByRole(@RequestParam String role){
+        Role requestRole;
+        try{
+            requestRole = Role.valueOf(role.toUpperCase());
+        }
+        catch (IllegalArgumentException e){
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(participantService.getByRole(requestRole));
     }
 }

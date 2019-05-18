@@ -10,7 +10,7 @@ import java.util.Set;
 
 public interface ClassService {
 
-     Set<CourseClass> findByDate(LocalDate date);
+     Set<CourseClass> getByDate(LocalDate date);
      Optional<CourseClass> addNewClass(CourseClass courseClass);
 
      Optional<CourseClass> cancelClass(Long id);
@@ -18,5 +18,11 @@ public interface ClassService {
      Optional<CourseClass> cancelClass(LocalDateTime classDate);
 
      Set<CourseClass> cancelClasses(LocalDate classesDate);
+
+     CourseClass save(CourseClass courseClass);
+
+     Set<CourseClass> getAll();
+
+     Optional<CourseClass> getById(Long id);
 
 }

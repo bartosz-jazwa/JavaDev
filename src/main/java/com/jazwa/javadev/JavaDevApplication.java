@@ -2,6 +2,7 @@ package com.jazwa.javadev;
 
 import com.jazwa.javadev.model.CourseClass;
 import com.jazwa.javadev.model.Participant;
+import com.jazwa.javadev.model.Role;
 import com.jazwa.javadev.repository.ClassRepo;
 import com.jazwa.javadev.repository.ParticipantRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,16 +34,25 @@ public class JavaDevApplication implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         Participant participant = new Participant();
-        participant.setIndex(1);
+        participant.setIndex(123);
         participant.setEmail("qwe");
         participant.setPassword(encoder.encode("asd"));
+        participant.setRole(Role.ADMIN);
         participantRepo.save(participant);
 
         Participant participant1 = new Participant();
-        participant1.setIndex(2);
+        participant1.setIndex(789);
         participant1.setEmail("xxx");
         participant1.setPassword(encoder.encode("www"));
+        participant1.setRole(Role.STUDENT);
         participantRepo.save(participant1);
+
+        Participant participant2 = new Participant();
+        participant2.setIndex(456);
+        participant2.setEmail("YYY");
+        participant2.setPassword(encoder.encode("www"));
+        participant2.setRole(Role.STUDENT);
+        participantRepo.save(participant2);
 
         LocalDate date = LocalDate.of(2019,1,1);
         LocalTime time = LocalTime.of(12,0);

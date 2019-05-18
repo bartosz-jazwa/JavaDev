@@ -1,8 +1,10 @@
 package com.jazwa.javadev.service;
 
 import com.jazwa.javadev.model.Participant;
+import com.jazwa.javadev.model.Role;
 import com.jazwa.javadev.repository.ParticipantRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -15,44 +17,59 @@ public class ParticipantServiceImpl implements ParticipantService {
     @Autowired
     ParticipantRepo participantRepo;
 
+
     @Override
-    public Set<Participant> findAll() {
-        return new HashSet<>(participantRepo.findAll());
+    public Set<Participant> getAll() {
+        Set<Participant> participants = new HashSet<>();
+        participants.addAll(participantRepo.findAll());
+        return participants;
     }
 
     @Override
-    public Optional<Participant> findByIndex(Integer index) {
-        return participantRepo.findById(index);
+    public Optional<Participant> getByIndex(Integer index) {
+        return participantRepo.getParticipantByIndex(index);
     }
 
     @Override
-    public Optional<Participant> findByEmail(String email) {
-        return Optional.ofNullable(participantRepo.getParticipantByEmail(email));
+    public Optional<Participant> getByEmail(String email) {
+        return participantRepo.getParticipantByEmail(email);
     }
 
     @Override
-    public boolean deleteByIndex(Integer index) {
-        participantRepo.deleteById(index);
-        return true;
+    public Optional<Participant> getById(Long id) {
+        return participantRepo.findById(id);
     }
 
     @Override
-    public boolean deleteByEmail(String email) {
-        Participant p = participantRepo.getParticipantByEmail(email);
-        participantRepo.delete(p);
-        return true;
+    public Set<Participant> getByRole(Role role) {
+
+        Set<Participant> participants = new HashSet<>();
+        participants.addAll(participantRepo.getParticipantByRole(role));
+        return participants;
     }
 
     @Override
-    public boolean addWithIndex(Integer index, String password) {
-        Participant p = new Participant(index,"",password,"","",null,null);
-        participantRepo.save(p);
-        return true;
+    public Optional<Participant> deleteByIndex(Integer index) {
+        return Optional.empty();
     }
 
     @Override
-    public boolean addWithEmail(String email, String password) {
-        Participant p = new Participant(null,email,password,"","",null,null);
-        return false;
+    public Optional<Participant> deleteByEmail(String email) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Participant> deleteById(Long id) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Participant> addWithIndex(Integer index, String password) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Participant> addWithEmail(String email, String password) {
+        return Optional.empty();
     }
 }
