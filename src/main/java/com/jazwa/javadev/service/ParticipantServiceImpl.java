@@ -4,6 +4,7 @@ import com.jazwa.javadev.model.Participant;
 import com.jazwa.javadev.model.Role;
 import com.jazwa.javadev.repository.ParticipantRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 
@@ -60,7 +61,9 @@ public class ParticipantServiceImpl implements ParticipantService {
 
     @Override
     public Optional<Participant> deleteById(Long id) {
-        return Optional.empty();
+        Optional<Participant> result = participantRepo.findById(id);
+        result.ifPresent(participant -> participantRepo.delete(participant));
+        return result;
     }
 
     @Override
@@ -71,5 +74,21 @@ public class ParticipantServiceImpl implements ParticipantService {
     @Override
     public Optional<Participant> addWithEmail(String email, String password) {
         return Optional.empty();
+    }
+
+    @Override
+    public Optional<Participant> addNew(Participant participant) {
+        Optional<Participant> result;
+        try {
+            result = Optional.ofNullable(participantRepo.save(participant));
+        } catch (DataIntegrityViolationException e){
+            return Optional.empty();
+        }
+        return result;
+    }
+
+    @Override
+    public Optional<Participant> save(Participant participant) {
+        return Optional.ofNullable(participantRepo.save(participant));
     }
 }

@@ -1,5 +1,6 @@
 package com.jazwa.javadev.config;
 
+import com.jazwa.javadev.service.ParticipantDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -11,14 +12,15 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
-    public UserDetailsService userDetailsService(){
-        return new UserDetailsService() {
+    public ParticipantDetailsService userDetailsService(){
+        return new ParticipantDetailsService() {
             @Override
             public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
                 return null;
@@ -27,7 +29,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public BCryptPasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
 
@@ -45,6 +47,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        /*http
+                .
+                //.authorizeRequests()
+                //.antMatchers("/securityNone").permitAll()
+                //.anyRequest().authenticated()
+                //.and()
+                .httpBasic().disable();*/
+
         http
                 .csrf().disable()
                 .headers().frameOptions().disable() //odblokowuje baze H2

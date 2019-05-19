@@ -20,7 +20,7 @@ import java.util.Arrays;
 @SpringBootApplication
 public class JavaDevApplication implements CommandLineRunner {
     @Autowired
-    BCryptPasswordEncoder encoder;
+    PasswordEncoder encoder;
 
     @Autowired
     ParticipantRepo participantRepo;

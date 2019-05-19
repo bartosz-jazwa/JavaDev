@@ -5,6 +5,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -105,5 +106,34 @@ public class Participant {
 
     public Long getId() {
         return id;
+    }
+
+    public Set<CourseClass> getClasses() {
+        return classes;
+    }
+
+    public void setClasses(Set<CourseClass> classes) {
+        this.classes = classes;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Participant that = (Participant) o;
+        return id.equals(that.id) &&
+                Objects.equals(index, that.index) &&
+                email.equals(that.email) &&
+                Objects.equals(password, that.password) &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(surname, that.surname) &&
+                Objects.equals(yearOfStudy, that.yearOfStudy) &&
+                Objects.equals(fieldOfStudy, that.fieldOfStudy) &&
+                role == that.role;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, index, email, password, name, surname, yearOfStudy, fieldOfStudy, role);
     }
 }

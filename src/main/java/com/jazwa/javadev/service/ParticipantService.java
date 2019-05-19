@@ -29,4 +29,8 @@ public interface ParticipantService {
     Optional<Participant> addWithIndex(Integer index,String password);
 
     Optional<Participant> addWithEmail(String email, String password);
+
+    Optional<Participant> addNew(Participant participant);
+
+    Optional<Participant> save(Participant participant);
 }

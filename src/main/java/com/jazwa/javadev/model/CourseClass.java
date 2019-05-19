@@ -2,6 +2,7 @@ package com.jazwa.javadev.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
@@ -9,6 +10,7 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -21,15 +23,24 @@ public class CourseClass {
     private String title;
     private String description;
     private String tutor;
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JsonIgnore
     private Set<Participant> participants = new HashSet<>();
 
     public void addParticipant(Participant participant){
         this.participants.add(participant);
     }
 
+    public void removeParticipant(Participant participant){
+        this.participants.remove(participant);
+    }
+
     public void addParticipants(List<Participant> participants){
         this.participants.addAll(participants);
+    }
+
+    public Set<Participant> getParticipants() {
+        return participants;
     }
 
     public CourseClass() {
@@ -77,15 +88,24 @@ public class CourseClass {
         this.tutor = tutor;
     }
 
-    public Set<Participant> getParticipants() {
-        return participants;
-    }
-
-    public void setParticipants(Set<Participant> participants) {
-        this.participants = participants;
-    }
-
     public void setId(Long id) {
         this.id = id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CourseClass that = (CourseClass) o;
+        return id.equals(that.id) &&
+                startTime.equals(that.startTime) &&
+                title.equals(that.title) &&
+                Objects.equals(description, that.description) &&
+                Objects.equals(tutor, that.tutor);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, startTime, title, description, tutor);
     }
 }
