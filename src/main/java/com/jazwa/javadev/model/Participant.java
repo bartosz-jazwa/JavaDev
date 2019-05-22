@@ -2,14 +2,17 @@ package com.jazwa.javadev.model;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
 @Entity
-public class Participant {
+public class Participant implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
@@ -30,14 +33,14 @@ public class Participant {
     public Participant() {
     }
 
-    public Participant(Integer index, String email, String password, String name, String surname, Integer yearOfStudy, String fieldOfStudy) {
-        this.index = index;
+    public Participant(String email, String password, String name, String surname, Integer yearOfStudy, String fieldOfStudy, Role role) {
         this.email = email;
         this.password = password;
         this.name = name;
         this.surname = surname;
         this.yearOfStudy = yearOfStudy;
         this.fieldOfStudy = fieldOfStudy;
+        this.role = role;
     }
 
     public Integer getIndex() {

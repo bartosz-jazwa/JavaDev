@@ -3,9 +3,13 @@ package com.jazwa.javadev.service;
 import com.jazwa.javadev.model.Participant;
 import com.jazwa.javadev.model.Role;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class ParticipantDetails implements UserDetails {
 
@@ -15,9 +19,16 @@ public class ParticipantDetails implements UserDetails {
         this.participant = participant;
     }
 
+    public ParticipantDetails() {
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        GrantedAuthority authority = new SimpleGrantedAuthority(participant.getRole().name());
+        Collection<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(authority);
+
+        return authorities;
     }
 
     @Override
@@ -32,21 +43,21 @@ public class ParticipantDetails implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return true;
     }
 }

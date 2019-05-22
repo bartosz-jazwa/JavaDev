@@ -1,6 +1,6 @@
 package com.jazwa.javadev.config;
 
-import com.jazwa.javadev.service.ParticipantDetailsService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -8,9 +8,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -18,15 +16,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Bean
-    public ParticipantDetailsService userDetailsService(){
-        return new ParticipantDetailsService() {
-            @Override
-            public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-                return null;
-            }
-        };
-    }
+    @Autowired
+    private UserDetailsService participantDetailsService;
 
     @Bean
     public PasswordEncoder passwordEncoder(){
@@ -36,24 +27,33 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public DaoAuthenticationProvider authenticationProvider(){
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService());
+        authProvider.setUserDetailsService(participantDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
 
+    /*@Autowired
+    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+        auth.inMemoryAuthentication()
+                .withUser("user1").password(passwordEncoder().encode("user1Pass"))
+                .authorities("STUDENT");
+    }*/
+    @Autowired
+    private MyBasicAuthenticationEntryPoint authenticationEntryPoint;
+
     @Override
-    protected void configure(AuthenticationManagerBuilder auth) {
+    public void configure(AuthenticationManagerBuilder auth) {
         auth.authenticationProvider(authenticationProvider());
     }
-    @Override
+    /*@Override
     protected void configure(HttpSecurity http) throws Exception {
-        /*http
+        *//*http
                 .
                 //.authorizeRequests()
                 //.antMatchers("/securityNone").permitAll()
                 //.anyRequest().authenticated()
                 //.and()
-                .httpBasic().disable();*/
+                .httpBasic().disable();*//*
 
         http
                 .csrf().disable()
@@ -65,5 +65,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
 
                 .formLogin().disable();
+    }*/
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.authorizeRequests()
+                .antMatchers("/securityNone").permitAll()
+                .anyRequest().authenticated()
+                .and()
+                .httpBasic()
+                .authenticationEntryPoint(authenticationEntryPoint);
+
+        /*http.addFilterAfter(new CustomFilter(),
+                BasicAuthenticationFilter.class);*/
     }
 }
