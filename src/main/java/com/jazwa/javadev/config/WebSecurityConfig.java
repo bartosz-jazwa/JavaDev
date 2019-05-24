@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -39,7 +40,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorities("STUDENT");
     }*/
     @Autowired
-    private MyBasicAuthenticationEntryPoint authenticationEntryPoint;
+    private ParticipantBasicAuthenticationEntryPoint authenticationEntryPoint;
 
     @Override
     public void configure(AuthenticationManagerBuilder auth) {
@@ -69,8 +70,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
-                .antMatchers("/securityNone").permitAll()
+        http
+                .csrf().disable()
+                .headers().frameOptions().disable()
+                .and()
+                .authorizeRequests()
                 .anyRequest().authenticated()
                 .and()
                 .httpBasic()

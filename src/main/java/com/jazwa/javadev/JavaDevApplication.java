@@ -35,21 +35,21 @@ public class JavaDevApplication implements CommandLineRunner {
     public void run(String... args) throws Exception {
         Participant participant = new Participant();
         participant.setIndex(123);
-        participant.setEmail("qwe");
+        participant.setEmail("a@onet.pl");
         participant.setPassword(encoder.encode("asd"));
         participant.setRole(Role.ADMIN);
         participantRepo.save(participant);
 
         Participant participant1 = new Participant();
         participant1.setIndex(789);
-        participant1.setEmail("xxx");
+        participant1.setEmail("b@onet.pl");
         participant1.setPassword(encoder.encode("www"));
         participant1.setRole(Role.STUDENT);
         participantRepo.save(participant1);
 
         Participant participant2 = new Participant();
         participant2.setIndex(456);
-        participant2.setEmail("YYY");
+        participant2.setEmail("c@onet.pl");
         participant2.setPassword(encoder.encode("www"));
         participant2.setRole(Role.STUDENT);
         participantRepo.save(participant2);
@@ -64,7 +64,6 @@ public class JavaDevApplication implements CommandLineRunner {
         //class2.addParticipants(Arrays.asList(participant1,participant));
         classRepo.save(class1);
         classRepo.save(class2);
-
 
     }
 }

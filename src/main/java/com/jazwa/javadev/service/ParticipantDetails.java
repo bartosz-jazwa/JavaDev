@@ -22,9 +22,13 @@ public class ParticipantDetails implements UserDetails {
     public ParticipantDetails() {
     }
 
+    public Participant getParticipant() {
+        return participant;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        GrantedAuthority authority = new SimpleGrantedAuthority(participant.getRole().name());
+        GrantedAuthority authority = new SimpleGrantedAuthority(participant.getRole().toString());
         Collection<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(authority);
 

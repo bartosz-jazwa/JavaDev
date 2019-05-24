@@ -11,13 +11,12 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 @Component
-public class MyBasicAuthenticationEntryPoint extends BasicAuthenticationEntryPoint {
+public class ParticipantBasicAuthenticationEntryPoint extends BasicAuthenticationEntryPoint {
 
     @Override
-    public void commence
-            (HttpServletRequest request, HttpServletResponse response, AuthenticationException authEx)
+    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authEx)
             throws IOException, ServletException {
-        response.addHeader("WWW-Authenticate", "Basic realm=\"" + getRealmName() + "\"");
+        //response.addHeader("WWW-Authenticate", "Basic realm=\"" + getRealmName() + "\"");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         PrintWriter writer = response.getWriter();
         writer.println("HTTP Status 401 - " + authEx.getMessage());
@@ -25,7 +24,7 @@ public class MyBasicAuthenticationEntryPoint extends BasicAuthenticationEntryPoi
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        setRealmName("Baeldung");
+        setRealmName("JavaDev");
         super.afterPropertiesSet();
     }
 }

@@ -4,13 +4,20 @@ import com.jazwa.javadev.model.CourseClass;
 import com.jazwa.javadev.model.Participant;
 import com.jazwa.javadev.model.Role;
 import com.jazwa.javadev.service.ClassService;
+import com.jazwa.javadev.service.ParticipantDetails;
 import com.jazwa.javadev.service.ParticipantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.web.method.annotation.AuthenticationPrincipalArgumentResolver;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.security.RolesAllowed;
+import java.security.Principal;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
@@ -33,14 +40,15 @@ public class ParticipantController {
     }
 
     @GetMapping("/{id}")
-    ResponseEntity<Participant> getParticipant(@PathVariable String id) {
-        Long partId;
-        try {
-            partId = Long.parseLong(id);
-        } catch (NumberFormatException e) {
-            return ResponseEntity.badRequest().build();
+    ResponseEntity<Participant> getParticipant(@PathVariable Long id,
+                                               @AuthenticationPrincipal(expression = "participant") Participant p) {
+
+        if (p.getRole()==Role.ADMIN){
+            return ResponseEntity.of(participantService.getById(id));
+        }else {
+            return ResponseEntity.of(participantService.getById(p.getId()));
         }
-        return ResponseEntity.of(participantService.getById(partId));
+
     }
 
     @GetMapping(params = "role")
@@ -73,6 +81,7 @@ public class ParticipantController {
     }
 
     @PostMapping
+    @Secured("ROLE_ADMIN")
     ResponseEntity<Participant> addNewParticipant(@RequestBody Participant participant) {
         Participant participantWithPassEncoded = participant;
         participantWithPassEncoded.setPassword(bcrypt.encode(participant.getPassword()));

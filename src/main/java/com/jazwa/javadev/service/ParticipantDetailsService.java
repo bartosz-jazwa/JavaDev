@@ -8,10 +8,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityNotFoundException;
-import java.io.Serializable;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
 
-@Service(value = "userDetail")
+@Service
 public class ParticipantDetailsService implements UserDetailsService {
 
     @Autowired
@@ -19,7 +19,24 @@ public class ParticipantDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String s) {
-        Participant participant = participantService.getByEmail(s).orElseThrow(() -> new UsernameNotFoundException(s));
+
+
+        Participant participant;
+        Integer index;
+        try {
+            index = Integer.parseInt(s);
+            participant = participantService.getByIndex(index)
+                    .orElseThrow(() -> new UsernameNotFoundException(s));
+        } catch (NumberFormatException e) {
+            if (Participant.isValidEmailAddress(s)) {
+                participant = participantService.getByEmail(s)
+                        .orElseThrow(() -> new UsernameNotFoundException(s));
+            }else {
+                participant = new Participant();
+            }
+        }
+
+
         /*return User.withUsername(participant.getEmail())
                 .password(participant.getPassword())
                 .disabled(false)
@@ -28,4 +45,6 @@ public class ParticipantDetailsService implements UserDetailsService {
                 .build();*/
         return new ParticipantDetails(participant);
     }
+
+
 }
