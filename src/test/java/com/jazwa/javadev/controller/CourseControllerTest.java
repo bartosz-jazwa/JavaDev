@@ -11,9 +11,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -33,6 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
+//@WebMvcTest(CourseController.class)
 @AutoConfigureMockMvc
 public class CourseControllerTest {
 
@@ -45,6 +48,7 @@ public class CourseControllerTest {
     @MockBean
     ClassRepo classRepo;
 
+    @WithMockUser(value = "123")
     @Test
     public void getAllClassesOk() throws Exception {
         LocalDateTime courseClassId1 = LocalDateTime.of(2019,6,1,18,0);
@@ -67,6 +71,7 @@ public class CourseControllerTest {
                 .andExpect(jsonPath("$",hasSize(2)));
     }
 
+    @WithMockUser(value = "123")
     @Test
     public void getAllClassesNoContent() throws Exception{
         List<CourseClass> classList = new ArrayList<>();
@@ -76,6 +81,7 @@ public class CourseControllerTest {
                 .andExpect(status().isNoContent());
     }
 
+    @WithMockUser(value = "123")
     @Test
     public void getClassesByDateOk() throws Exception{
         LocalDateTime courseClassId1 = LocalDateTime.of(2019,6,1,18,0);
@@ -95,6 +101,8 @@ public class CourseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$",hasSize(2)));
     }
+
+    @WithMockUser(value = "123")
     @Test
     public void getClassesByDateNoContent() throws Exception{
         Set<CourseClass> classSet = new HashSet<>();
@@ -105,6 +113,7 @@ public class CourseControllerTest {
                 .andExpect(status().isNoContent());
     }
 
+    @WithMockUser(value = "123")
     @Test
     public void getSingleClassOK() throws Exception {
         LocalDateTime classDate = LocalDateTime.of(2019,6,1,18,0);
@@ -117,6 +126,7 @@ public class CourseControllerTest {
                 .andExpect(jsonPath("$.title").value("Java"));
     }
 
+    @WithMockUser(value = "123")
     @Test
     public void getSingleClassNotFound() throws Exception{
         when(classService.getById(2L)).thenReturn(Optional.empty());
@@ -124,6 +134,8 @@ public class CourseControllerTest {
                 .andExpect(status().isNotFound());
 
     }
+
+    @WithMockUser(value = "123")
     @Test
     public void addNewClassOk() throws Exception {
         CourseClass courseClass = new CourseClass();
@@ -154,6 +166,7 @@ public class CourseControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @WithMockUser(value = "123")
     @Test
     public void addNewClassNotAcceptableWhenServiceReturnsEmpty() throws Exception {
         CourseClass courseClass = new CourseClass();
@@ -176,6 +189,7 @@ public class CourseControllerTest {
                 .andExpect(status().isNotAcceptable());
     }
 
+    @WithMockUser(value = "123")
     @Test
     public void addNewClassBadRequestWhenEmptyBody() throws Exception {
         CourseClass courseClass = new CourseClass();
@@ -198,10 +212,6 @@ public class CourseControllerTest {
 
     @Test
     public void deleteClass() {
-    }
-
-    @Test
-    public void deleteClass1() {
     }
 
     @Test
