@@ -1,9 +1,6 @@
 package com.jazwa.javadev.controller;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.jazwa.javadev.model.CourseClass;
 import com.jazwa.javadev.repository.ClassRepo;
 import com.jazwa.javadev.service.ClassService;
@@ -11,7 +8,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -19,18 +15,14 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.awt.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.*;
-import java.util.List;
 
-import static org.hamcrest.collection.IsCollectionWithSize.*;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -111,6 +103,17 @@ public class CourseControllerTest {
 
         mockMvc.perform(get("/classes?date=2019-06-01"))
                 .andExpect(status().isNoContent());
+    }
+
+    @WithMockUser(value = "123")
+    @Test
+    public void getClassesByDateBadRequest() throws Exception{
+        Set<CourseClass> classSet = new HashSet<>();
+
+        when(classService.getByDate(LocalDate.of(2019,6,1))).thenReturn(classSet);
+
+        mockMvc.perform(get("/classes?date=2019.06.01"))
+                .andExpect(status().isBadRequest());
     }
 
     @WithMockUser(value = "123")
@@ -210,11 +213,154 @@ public class CourseControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @WithMockUser(value = "123")
     @Test
-    public void deleteClass() {
+    public void deleteClassByDateReturnsOk() throws Exception {
+        CourseClass courseClass = new CourseClass();
+        courseClass.setStartTime(LocalDateTime.of(2019,1,1,12,0));
+        courseClass.setTitle("Java");
+        courseClass.setDescription("from scratch");
+        courseClass.setTutor("Mr Bean");
+
+        CourseClass courseClass1 = new CourseClass();
+        courseClass1.setStartTime(LocalDateTime.of(2019,1,1,13,0));
+        courseClass1.setTitle("asembler");
+        courseClass1.setDescription("from scratch");
+        courseClass1.setTutor("Mr Bean");
+
+        Set<CourseClass> classSet = new HashSet<>();
+        classSet.add(courseClass);
+        classSet.add(courseClass1);
+
+        when(classService.cancelClasses(LocalDate.of(2019,1,1))).thenReturn(classSet);
+        mockMvc.perform(delete("/classes?date=2019-01-01")
+                .contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",hasSize(2)));
     }
 
+    @WithMockUser(value = "123")
     @Test
-    public void updateClass() {
+    public void deleteClassByDateReturnsBadRequestWhenDateFormatInvalid() throws Exception {
+        CourseClass courseClass = new CourseClass();
+        courseClass.setStartTime(LocalDateTime.of(2019,1,1,12,0));
+        courseClass.setTitle("Java");
+        courseClass.setDescription("from scratch");
+        courseClass.setTutor("Mr Bean");
+
+        CourseClass courseClass1 = new CourseClass();
+        courseClass1.setStartTime(LocalDateTime.of(2019,1,1,13,0));
+        courseClass1.setTitle("asembler");
+        courseClass1.setDescription("from scratch");
+        courseClass1.setTutor("Mr Bean");
+
+        Set<CourseClass> classSet = new HashSet<>();
+        classSet.add(courseClass);
+        classSet.add(courseClass1);
+
+        when(classService.cancelClasses(LocalDate.of(2019,1,1))).thenReturn(classSet);
+        mockMvc.perform(delete("/classes?date=2019.01.01")
+                .contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isBadRequest());
+    }
+
+    @WithMockUser(value = "123")
+    @Test
+    public void deleteClassByIdeReturnsOk() throws Exception {
+        CourseClass courseClass = new CourseClass();
+        courseClass.setStartTime(LocalDateTime.of(2019,1,1,12,0));
+        courseClass.setTitle("Java");
+        courseClass.setDescription("from scratch");
+        courseClass.setTutor("Mr Bean");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.findAndRegisterModules();
+        String postContent = objectMapper.writeValueAsString(courseClass);
+
+        when(classService.cancelClass(1L)).thenReturn(Optional.ofNullable(courseClass));
+        mockMvc.perform(delete("/classes/1")
+                .content(postContent)
+                .contentType(MediaType.APPLICATION_JSON_UTF8))
+
+                .andExpect(status().isOk());
+    }
+
+    @WithMockUser(value = "123")
+    @Test
+    public void deleteClassByIdeReturnsNotFound() throws Exception {
+
+        when(classService.cancelClass(1L)).thenReturn(Optional.empty());
+        mockMvc.perform(delete("/classes/1"))
+
+                .andExpect(status().isNotFound());
+    }
+
+    @WithMockUser(value = "123")
+    @Test
+    public void updateClassReturnsOk() throws Exception {
+        CourseClass courseClass = new CourseClass();
+        courseClass.setStartTime(LocalDateTime.of(2019,1,1,12,0));
+        courseClass.setTitle("Java");
+        courseClass.setDescription("from scratch");
+        courseClass.setTutor("Mr Bean");
+
+        courseClass.setId(1L);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.findAndRegisterModules();
+        String postContent = objectMapper.writeValueAsString(courseClass);
+
+        when(classService.getById(1L)).thenReturn(Optional.ofNullable(courseClass));
+        mockMvc.perform(put("/classes/1?date=2019-01-01&time=12:00&title=Java&description=from scratch&tutor=Mr Bean")
+                .content(postContent)
+                .contentType(MediaType.APPLICATION_JSON_UTF8))
+
+                .andExpect(status().isOk());
+    }
+
+    @WithMockUser(value = "123")
+    @Test
+    public void updateClassReturnsBadRequestWhenInvalidDateFormat() throws Exception {
+        CourseClass courseClass = new CourseClass();
+        courseClass.setStartTime(LocalDateTime.of(2019,1,1,12,0));
+        courseClass.setTitle("Java");
+        courseClass.setDescription("from scratch");
+        courseClass.setTutor("Mr Bean");
+
+        courseClass.setId(1L);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.findAndRegisterModules();
+        String postContent = objectMapper.writeValueAsString(courseClass);
+
+        when(classService.getById(1L)).thenReturn(Optional.ofNullable(courseClass));
+        mockMvc.perform(put("/classes/1?date=2019.01-01&time=12:00&title=Java&description=from scratch&tutor=Mr Bean")
+                .content(postContent)
+                .contentType(MediaType.APPLICATION_JSON_UTF8))
+
+                .andExpect(status().isBadRequest());
+    }
+
+    @WithMockUser(value = "123")
+    @Test
+    public void updateClassReturnsBadRequestWhenInvalidIdFormat() throws Exception {
+        CourseClass courseClass = new CourseClass();
+        courseClass.setStartTime(LocalDateTime.of(2019,1,1,12,0));
+        courseClass.setTitle("Java");
+        courseClass.setDescription("from scratch");
+        courseClass.setTutor("Mr Bean");
+
+        courseClass.setId(1L);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.findAndRegisterModules();
+        String postContent = objectMapper.writeValueAsString(courseClass);
+
+        when(classService.getById(1L)).thenReturn(Optional.ofNullable(courseClass));
+        mockMvc.perform(put("/classes/a?date=2019-01-01&time=12:00&title=Java&description=from scratch&tutor=Mr Bean")
+                .content(postContent)
+                .contentType(MediaType.APPLICATION_JSON_UTF8))
+
+                .andExpect(status().isBadRequest());
     }
 }

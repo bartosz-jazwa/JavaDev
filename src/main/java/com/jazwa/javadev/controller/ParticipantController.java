@@ -4,20 +4,15 @@ import com.jazwa.javadev.model.CourseClass;
 import com.jazwa.javadev.model.Participant;
 import com.jazwa.javadev.model.Role;
 import com.jazwa.javadev.service.ClassService;
-import com.jazwa.javadev.service.ParticipantDetails;
 import com.jazwa.javadev.service.ParticipantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.web.method.annotation.AuthenticationPrincipalArgumentResolver;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.security.RolesAllowed;
-import java.security.Principal;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
@@ -34,6 +29,7 @@ public class ParticipantController {
     PasswordEncoder bcrypt;
 
     @GetMapping
+    @Secured("ROLE_ADMIN")
     ResponseEntity<Set<Participant>> getAllParticipants() {
         Set<Participant> participants = participantService.getAll();
         return ResponseEntity.ok(participants);
@@ -43,7 +39,7 @@ public class ParticipantController {
     ResponseEntity<Participant> getParticipant(@PathVariable Long id,
                                                @AuthenticationPrincipal(expression = "participant") Participant p) {
 
-        if (p.getRole()==Role.ADMIN){
+        if (p.getRole()==Role.ROLE_ADMIN){
             return ResponseEntity.of(participantService.getById(id));
         }else {
             return ResponseEntity.of(participantService.getById(p.getId()));
@@ -63,10 +59,10 @@ public class ParticipantController {
     }
 
     @GetMapping("/{id}/classes")
-    ResponseEntity<Set<CourseClass>> getParticipantClasses(@PathVariable String id) {
+    ResponseEntity<Set<CourseClass>> getParticipantClasses(@PathVariable Long id) {
         Long partId;
         try {
-            partId = Long.parseLong(id);
+            partId = id;
         } catch (NumberFormatException e) {
             return ResponseEntity.badRequest().build();
         }

@@ -9,13 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Arrays;
 
 @SpringBootApplication
 public class JavaDevApplication implements CommandLineRunner {
@@ -37,21 +35,21 @@ public class JavaDevApplication implements CommandLineRunner {
         participant.setIndex(123);
         participant.setEmail("a@onet.pl");
         participant.setPassword(encoder.encode("asd"));
-        participant.setRole(Role.ADMIN);
+        participant.setRole(Role.ROLE_ADMIN);
         participantRepo.save(participant);
 
         Participant participant1 = new Participant();
         participant1.setIndex(789);
         participant1.setEmail("b@onet.pl");
         participant1.setPassword(encoder.encode("www"));
-        participant1.setRole(Role.STUDENT);
+        participant1.setRole(Role.ROLE_STUDENT);
         participantRepo.save(participant1);
 
         Participant participant2 = new Participant();
         participant2.setIndex(456);
         participant2.setEmail("c@onet.pl");
         participant2.setPassword(encoder.encode("www"));
-        participant2.setRole(Role.STUDENT);
+        participant2.setRole(Role.ROLE_STUDENT);
         participantRepo.save(participant2);
 
         LocalDate date = LocalDate.of(2019,1,1);

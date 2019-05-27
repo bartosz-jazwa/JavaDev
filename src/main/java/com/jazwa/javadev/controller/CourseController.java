@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -33,8 +34,13 @@ public class CourseController {
 
     @GetMapping(params = "date")
     ResponseEntity<Set<CourseClass>> getClassesByDate(@RequestParam String date) {
+        LocalDate courseDate;
+        try {
+            courseDate = LocalDate.parse(date);
+        }catch (DateTimeParseException c){
+            return ResponseEntity.badRequest().build();
+        }
 
-        LocalDate courseDate = LocalDate.parse(date);
         Set<CourseClass> courseClasses = classService.getByDate(courseDate);
         if (courseClasses.isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -43,20 +49,20 @@ public class CourseController {
     }
 
     @GetMapping("/{id}")
-    ResponseEntity<CourseClass> getOneCourseClass(@PathVariable String id) {
-        Long classId = Long.parseLong(id);
+    ResponseEntity<CourseClass> getOneCourseClass(@PathVariable Long id) {
+        Long classId = id;
         return ResponseEntity.of(classService.getById(classId));
     }
 
     @GetMapping("/{id}/participants")
-    ResponseEntity<Set<Participant>> getClassParticipants(@PathVariable String id){
-        Long classId = Long.parseLong(id);
+    ResponseEntity<Set<Participant>> getClassParticipants(@PathVariable Long id) {
+        Long classId = id;
         Set<Participant> participants = new HashSet<>();
         Optional<CourseClass> courseClass = classService.getById(classId);
-        if(courseClass.isPresent()){
+        if (courseClass.isPresent()) {
             participants = courseClass.get().getParticipants();
         }
-        if (participants.isEmpty()){
+        if (participants.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(participants);
@@ -75,9 +81,9 @@ public class CourseController {
     }
 
     @DeleteMapping("/{id}")
-    ResponseEntity<CourseClass> deleteClass(@PathVariable String id) {
+    ResponseEntity<CourseClass> deleteClass(@PathVariable(name = "id") Long id) {
 
-        Long classId = Long.parseLong(id);
+        Long classId = id;
 
         Optional<CourseClass> deleteResult = classService.cancelClass(classId);
         if (!deleteResult.isPresent()) {
@@ -87,9 +93,14 @@ public class CourseController {
 
     }
 
-    @DeleteMapping("/{date}")
-    ResponseEntity<Set<CourseClass>> deleteClasses(@PathVariable String date) {
-        LocalDate localDate = LocalDate.parse(date);
+    @DeleteMapping
+    ResponseEntity<Set<CourseClass>> deleteClasses(@RequestParam(name = "date") String date) {
+        LocalDate localDate;
+        try {
+            localDate = LocalDate.parse(date);
+        }catch (DateTimeParseException c){
+            return ResponseEntity.badRequest().build();
+        }
 
         Set<CourseClass> classSet = classService.cancelClasses(localDate);
         if (classSet.isEmpty()) {
@@ -99,7 +110,7 @@ public class CourseController {
     }
 
     @PutMapping("/{id}")
-    ResponseEntity<CourseClass> updateClass(@PathVariable String id,
+    ResponseEntity<CourseClass> updateClass(@PathVariable Long id,
                                             @RequestParam String date,
                                             @RequestParam String time,
                                             @RequestParam String title,
@@ -110,8 +121,8 @@ public class CourseController {
         Long classId;
         try {
             localDateTime = LocalDateTime.of(LocalDate.parse(date), LocalTime.parse(time));
-            classId = Long.parseLong(id);
-        } catch (Exception e) {
+            classId = id;
+        } catch (DateTimeParseException e) {
             return ResponseEntity.badRequest().build();
         }
 
