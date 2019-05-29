@@ -32,12 +32,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return authProvider;
     }
 
-    /*@Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth.inMemoryAuthentication()
-                .withUser("user1").password(passwordEncoder().encode("user1Pass"))
-                .authorities("STUDENT");
-    }*/
     @Autowired
     private ParticipantBasicAuthenticationEntryPoint authenticationEntryPoint;
 
@@ -45,27 +39,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(AuthenticationManagerBuilder auth) {
         auth.authenticationProvider(authenticationProvider());
     }
-    /*@Override
-    protected void configure(HttpSecurity http) throws Exception {
-        *//*http
-                .
-                //.authorizeRequests()
-                //.antMatchers("/securityNone").permitAll()
-                //.anyRequest().authenticated()
-                //.and()
-                .httpBasic().disable();*//*
-
-        http
-                .csrf().disable()
-                .headers().frameOptions().disable() //odblokowuje baze H2
-                .and()
-                .authorizeRequests().antMatchers("/login").permitAll()
-
-                .and()
-                .csrf().disable()
-
-                .formLogin().disable();
-    }*/
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -84,9 +57,5 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .logoutUrl("/logout")
                 .invalidateHttpSession(true)
                 .deleteCookies("SESSION");
-
-
-        /*http.addFilterAfter(new CustomFilter(),
-                BasicAuthenticationFilter.class);*/
     }
 }

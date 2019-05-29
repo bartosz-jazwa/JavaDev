@@ -47,7 +47,7 @@ public class ClassServiceImpl implements ClassService {
         } else {
             return result;
         }
-        return classRepo.deleteCourseClassById(foundCourseClass.getId());
+        return classRepo.deleteCourseClassById(id);
     }
 
     @Override
