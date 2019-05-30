@@ -2,14 +2,10 @@ package com.jazwa.javadev.service;
 
 import com.jazwa.javadev.model.Participant;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
 
 @Service
 public class ParticipantDetailsService implements UserDetailsService {
@@ -35,16 +31,6 @@ public class ParticipantDetailsService implements UserDetailsService {
                 participant = new Participant();
             }
         }
-
-
-        /*return User.withUsername(participant.getEmail())
-                .password(participant.getPassword())
-                .disabled(false)
-                .accountExpired(false)
-                .authorities(participant.getRole().toString())
-                .build();*/
         return new ParticipantDetails(participant);
     }
-
-
 }
